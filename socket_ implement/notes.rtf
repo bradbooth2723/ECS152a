@@ -1,0 +1,102 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2636
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;\f1\fnil\fcharset0 .AppleSystemUIFontMonospaced-Regular;\f2\fnil\fcharset0 .AppleSystemUIFontMonospaced-Bold;
+\f3\fnil\fcharset0 .AppleSystemUIFontMonospaced-Semibold;\f4\fnil\fcharset0 HelveticaNeue-Bold;\f5\fswiss\fcharset0 Helvetica-Bold;
+\f6\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgray\c0\c0;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\margl1440\margr1440\vieww31820\viewh14260\viewkind0
+\deftab720
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f0\fs36 \cf2 \cb3 \expnd0\expndtw0\kerning0
+Find the process using port 
+\f1 8008
+\f0  with 
+\f1 lsof
+\f0 :\
+\pard\pardeftab720\partightenfactor0
+
+\f2\b \cf2 HOW TO RELEASE THE PORT \
+
+\f1\b0 [OPTION 1]\
+$ lsof -i -n -P | grep UDP | grep 8008\
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f0 \cf2 But surprisingly doesn't return any results.\
+However, I had more luck with 
+\f1 netstat
+\f0 :\
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf2 $ netstat -tulnvp udp | grep 8008\
+udp4  0  0  *.8008    *.*    196724   9216  47205   0\
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f0 \cf2 So, the port is indeed bound, and the culprit is pid 
+\f1 47205
+\f0 , however:\
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf2 $ ps aux | grep 47205\
+\
+[OPTION 2]\
+\
+\pard\pardeftab720\sa165\partightenfactor0
+
+\f0 \cf2 Find out the process ID (PID) which is occupying the port number (e.g., 5955) you would like to free\
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf2 sudo lsof -i :5955\
+\
+
+\f2\b Wireshark \
+\pard\pardeftab720\partightenfactor0
+
+\f3 \cf2 Interface loopback:Io0\
+UDP will show up as LLC \
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f0\b0 \cf2 You can change it in Edit->Preferences->Protocols->LLC. You can disable LLC dissector from there.\
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f4\b \cf2 FINDING YOUR UDP/TCP IN WIRESHARK\
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f0\b0 \cf2 udp.port == 12000\
+\
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f4\b \cf2 Three way handshake for TCP: \
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0
+\f5 \AppleTypeServices\AppleTypeServicesF65539 \cf2 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Step 1 (SYN): 
+\f6\b0 \AppleTypeServices\AppleTypeServicesF65539 In the first step, the client wants to establish a connection with a server, so it sends a segment with SYN(Synchronize Sequence Number) which informs the server that the client is likely to start communication and with what sequence number it starts segments with\
+\ls1\ilvl0
+\f5\b \AppleTypeServices\AppleTypeServicesF65539 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Step 2 (SYN + ACK): 
+\f6\b0 \AppleTypeServices\AppleTypeServicesF65539 Server responds to the client request with SYN-ACK signal bits set. Acknowledgement(ACK) signifies the response of the segment it received and SYN signifies with what sequence number it is likely to start the segments with\
+\ls1\ilvl0
+\f5\b \AppleTypeServices\AppleTypeServicesF65539 \kerning1\expnd0\expndtw0 {\listtext	\uc0\u8226 	}\expnd0\expndtw0\kerning0
+Step 3 (ACK): 
+\f6\b0 \AppleTypeServices\AppleTypeServicesF65539 In the final part client acknowledges the response of the server and they both establish a reliable connection with which they will start the actual data transfer
+\f0 \AppleTypeServices \
+\pard\pardeftab720\sa330\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f4\b \cf2 Additional optional reading: \
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f0\b0 \cf2 Socket Server with Multiple Clients | Multithreading | Python  [https://codezup.com/socket-server-with-multiple-clients-model-multithreading-python/]\
+\pard\pardeftab720\partightenfactor0
+\cf2 \
+\pard\pardeftab720\sa330\partightenfactor0
+\cf2 \
+\
+\pard\pardeftab720\sa330\partightenfactor0
+
+\f3\b \cf2 \
+}
