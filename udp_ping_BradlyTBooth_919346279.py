@@ -1,13 +1,20 @@
 from socket import *
 import time
-from datetime import timedelta
 import traceback
 import sys
 import time
 import random
 
-#TODO: Print ping response message after each packet received.  Will probably implement a function to do that (We saw how well that went last time we did that)
-#TODO: Print ping statistics at very end of program
+
+def pingMessage(message='', elapsedTime=0, serverAddress='173.230.149.18', packetNumber=0, sendRecFlag=0):
+    if(sendRecFlag == 0):
+        print("Message: {} recieved from {}.  Round Trip Time: {}".format(message, serverAddress, elapsedTime))
+    elif(sendRecFlag == 1):
+        print("Packet {}: Pinging {}".format(packetNumber, serverAddress))
+    elif(sendRecFlag == 2):
+        print("Packet {} Lost".format(packetNumber))
+
+
 
 serverName = '173.230.149.18' #Test Server
 #serverName = '10.255.255.1'  #Timeout Address
@@ -24,45 +31,55 @@ timeoutSeconds = 10     #Amount of time program will wait before sending another
 timeoutCount = 0        #Number of times no response has been recieved from server in a row
 lastTry = False         #If timeout becomes longer than 10 minutes, will try one more request before raising an exception
 pingResponseList = []   #List of responses from server
-
+packetsReceived = 0
+packetsDropped = 0
+#breakpoint()
 #Loops 10 times:  Sends out 10 ping requests from server
 for i in range(10):
     timeout = False
+    pingMessage(packetNumber=i+1, serverAddress=serverName, sendRecFlag=1)
     try:
         startTime = time.time()
+
         clientSocket.sendto(encodedMessage, (serverName, serverPort))
         clientSocket.settimeout(10)    #Will throw exception if clientSocket does not recieve a response in 10 seconds.
         message, serverAddress = clientSocket.recvfrom(2048)
+
         elapsedTime = time.time() - startTime
-        pingResponseList.append(elapsedTime) #Appends response time 
-         
-    except Exception:
+ 
+    except error:
         timeout = True
         if (lastTry == True):
             raise NameError("Timeout: Server is busy or something else is wrong.  Try again later.")  #Raises exception if wait time becomes longer than 10 minutes
         if (timeoutSeconds > 600):
             lastTry = True;
             timeoutSeconds = 600
+
         time.sleep(timeoutSeconds)  
         timeoutSeconds = timeoutSeconds * 2 ** timeoutCount + random.uniform(0,1)  #Determines wait time if packet is lost again
         timeoutCount = timeoutCount + 1
-        pingResponseList.append(-1)    #Appends element to list indicating dropped packet 
+
+        #pingResponseList.append(-1)    #Appends element to list indicating dropped packet 
+        pingMessage(packetNumber = i+1, sendRecFlag = 2)
+        
+        packetsDropped = packetsDropped + 1
+    else:
+        pingMessage(message = message, serverAddress = serverAddress, elapsedTime = elapsedTime)
+        pingResponseList.append(elapsedTime) #Appends response time 
+        packetsReceived = packetsReceived + 1
+
     if(timeout == False):
         timeoutSeconds = 10
         timeoutCount = 0
 
-packetsReceived = 0
-packetsDropped = 0
-for i in pingResponseList:
-    if(i[0] == -1):
-        packetsDropped += 1
-    else:
-        packetsRecieved += 1
+mx = max(pingResponseList)
+mn = min(pingResponseList)
+sm = sum(pingResponseList)
 
-print(pingResponseList)
+print("\nPing Statistics: Packets Sent: 10, Packets Received: {}, Packets Lost: {}".format(packetsReceived, packetsDropped))
+print("Max RTT: {} seconds.".format(mx))
+print("Min RTT: {} seconds.".format(mn))
+print("Sum RTT: {} seconds.".format(sm))
+print("Average RTT: {} seconds.".format(sm/10))
+
 clientSocket.close()
-
-#Ok, so the expnential timeout function is called if you do not recieve a response.  We wait
-#because we know the server exists, but it might not recieving a response because the server is
-#very busy.  Ok, so I will probably write a function to handle the backoff sleep because my 
-#code is starting to get a little messy.  This notion of backoff function confuses and infuriates me!!
