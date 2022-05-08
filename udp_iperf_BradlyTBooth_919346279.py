@@ -4,10 +4,12 @@ import random
 import time
 import traceback
 import sys
+import os
+from pathlib import Path
 
 serverName = '173.230.149.18'
 #serverName = '10.255.255.1'
-serverPort = 5005 #12000 5005 5006 5007
+serverPort = 5007 #12000 5005 5006 5007
 
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 
@@ -53,7 +55,13 @@ while messageLength != 1300000:
         timeoutSeconds = 10
         timeoutCount = 0
 
+cd = Path.cwd()
+hfile = open(cd / Path('text.txt'), 'w')
+hfile.write(fullMessage.decode())
+hfile.close()
+
+fileSize = os.path.getsize(cd / Path('text.txt'))
 print("Time elapsed: {} seconds".format((RTT[-1])))
-print("File Size: {} bytes".format(messageLength))
-print("Throughput: {} bytes per second".format(messageLength/RTT[-1]))
+print("File Size: {} bytes".format(fileSize))
+print("Throughput: {} bytes per second".format(fileSize/RTT[-1]))
 clientSocket.close()
