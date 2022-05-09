@@ -6,6 +6,7 @@ from socket import *
 from pathlib import Path
 from bs4 import BeautifulSoup
 import time
+import os
 
 serverName = '173.230.149.18'
 serverPort = 23662
@@ -108,7 +109,8 @@ for link in soup.find_all('img'):
     if(flag != -1):
         y = image.find(b'\r\n\r\n') + 4
         image = image[y:]
-        hfile = open(cd / Path(imageName), 'wb')
+        os.makedirs(cd / Path('images'), exist_ok = True)
+        hfile = open(cd / Path('images') / Path(imageName), 'wb')
         hfile.write(image)
         hfile.close()
 
@@ -122,10 +124,3 @@ print("Average Request Delay: {} seconds".format(sum(listTime)/len(listTime)))
 print("Above the Fold Load Time: {} seconds".format(ATF))
 print("Request per Second:       {} seconds".format(len(listTime)/sum(listTime)))
 print(a)
-
-
-
-
-
-
-
