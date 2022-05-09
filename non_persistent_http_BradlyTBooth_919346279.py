@@ -7,6 +7,7 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 import time
+import os
 
 serverName = '173.230.149.18'
 serverPort = 23662
@@ -88,7 +89,8 @@ for link in soup.find_all('img'): #iterating through all elements with image tag
     if(flag != -1):
         y = image.find(b'\r\n\r\n') + 4
         image = image[y:]
-        hfile = open(cd / Path(imageName), 'wb')
+        os.makedirs(cd / Path('images'), exist_ok = True)
+        hfile = open(cd / Path('images') / Path(imageName), 'wb')
         hfile.write(image)
         hfile.close()
 PLT = time.time() - startTime
