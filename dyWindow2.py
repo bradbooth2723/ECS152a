@@ -105,9 +105,6 @@ def DynamicWindow(port):
             print("windowSize: ", windowSize)
 
 
-
-
-
 if __name__ == "__main__":
     Port = int(input("Enter Port Number to run: "))
     DynamicWindow(Port)
